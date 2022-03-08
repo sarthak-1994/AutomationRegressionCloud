@@ -1,10 +1,8 @@
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
@@ -13,12 +11,14 @@ import org.testng.annotations.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class LambdaExecution {
+public class Saucelab {
 
-    public RemoteWebDriver driver = null;
-    String username = "sartom1994";
-    String accessKey = "d4XMMojeIQjwWaYfs1e5GgePfcvwHQOJEl5pdMi92YhaStKszR";
-    private String Status=null;
+    WebDriver driver;
+
+    public static final String AUTOMATE_USERNAME = "oauth-anuragtomar6-ef076";
+    public static final String AUTOMATE_ACCESS_KEY = "5aee57a7-41c7-41e3-9faa-0a3b91462057";
+    public static final String URL = "https://" + AUTOMATE_USERNAME + ":" + AUTOMATE_ACCESS_KEY + "@ondemand.saucelabs.com/wd/hub";
+
 
     @BeforeTest
     @Parameters("browser")
@@ -47,37 +47,27 @@ public class LambdaExecution {
         capabilities.setCapability("video", true); // To enable video recording
         capabilities.setCapability("console", true); // To capture console logs
         try {
-            driver = new RemoteWebDriver(new URL("https://" + username + ":" + accessKey + "@hub.lambdatest.com/wd/hub"), capabilities);
+            driver = new RemoteWebDriver(new URL(URL), capabilities);
         } catch (MalformedURLException e) {
             System.out.println("Invalid grid URL");
         }
+
+
     }
 
-    @Test(enabled = true)
-    public void testScript() throws Exception {
-        try {
-            driver.get("https://lambdatest.github.io/sample-todo-app/");
-            driver.findElement(By.name("li1")).click();
-            driver.findElement(By.name("li2")).click();
-            driver.findElement(By.id("sampletodotext")).clear();
-            driver.findElement(By.id("sampletodotext")).sendKeys("Yey, Let's add it to list");
-            String text=  driver.findElement(By.id("sampletodotext")).getText();
-            if(text.equalsIgnoreCase("Yey, Let's add it to list"))
-            {Status="passed";}
-            else
-            {Status="passed";}
-            driver.findElement(By.id("addbutton")).click();
+    @Test
+    public void login()
+    {
+        driver.get("https://lambdatest.github.io/sample-todo-app/");
+        driver.findElement(By.name("li1")).click();
+        driver.findElement(By.name("li2")).click();
+        Assert.assertEquals(driver.getTitle().length(),10);
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 
     @AfterTest
-    void markTestStatus()
+    public void teardown()
     {
-        ((JavascriptExecutor)driver).executeScript("lambda-status="+ Status);
         driver.quit();
     }
-
 }
